@@ -34,7 +34,11 @@ function Header() {
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Toggle theme</p>
+                {theme === 'light' ? (
+                  <p>Switch to Dark Mode</p>
+                ) : (
+                  <p>Switch to Light Mode</p>
+                )}
               </TooltipContent>
             </Tooltip>
 
