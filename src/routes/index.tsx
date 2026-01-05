@@ -1,19 +1,13 @@
-import HomePage from 'pages/Home'
-import PostListPage from 'pages/PostList'
-import PostPage from 'pages/Post'
-import TagPage from 'pages/Tag'
-import AboutPage from 'pages/About'
-import NotFoundPage from 'pages/NotFound'
-import ErrorPage from 'pages/Error'
+import HomePage from '../pages/Home'
+import PostPage from '../pages/Post'
+import TagPage from '../pages/Tag'
+import NotFoundPage from '../pages/NotFound'
+import ErrorPage from '../pages/Error'
 
 export const routes = [
   {
     path: '/',
     element: <HomePage />
-  },
-  {
-    path: '/posts',
-    element: <PostListPage />
   },
   {
     path: '/post/:slug',
@@ -22,10 +16,6 @@ export const routes = [
   {
     path: '/tag/:slug',
     element: <TagPage />
-  },
-  {
-    path: '/about',
-    element: <AboutPage />
   },
   {
     path: '/error',
