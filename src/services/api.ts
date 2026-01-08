@@ -24,11 +24,17 @@ export class ApiClient {
     const response = await fetch(url, config)
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({
+      const errorBody = await response.json().catch(() => null)
+      throw {
         message: 'An error occurred',
-        statusCode: response.status
-      }))
-      throw error
+        statusCode: response.status,
+        ...errorBody
+      }
+    }
+
+    const contentType = response.headers.get('content-type')
+    if (response.status === 204 || !contentType?.includes('application/json')) {
+      return {} as T
     }
 
     return response.json()
