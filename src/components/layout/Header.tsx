@@ -26,11 +26,11 @@ function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
 
   return (
-    <header className="border-b">
+    <header className="border-b sticky top-0 z-50 bg-background">
       <div className="container mx-auto px-4 py-4 flex justify-between">
         <div className="flex items-center gap-8">
           <Link to="/">
-            <Logo className="h-8 w-8" />
+            <Logo className="h-9 w-9" />
           </Link>
 
           {/* Search Button */}
