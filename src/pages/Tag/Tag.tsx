@@ -106,7 +106,7 @@ function Tag() {
     return (
       <div className="flex flex-col gap-8">
         <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <TagIcon size={28} />
             <Skeleton className="h-4 w-40 inline-block" />
           </div>
@@ -142,7 +142,7 @@ function Tag() {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <TagIcon size={28} />
           <p className="text-lg font-bold">{tag?.name}</p>
         </div>
