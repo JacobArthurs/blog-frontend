@@ -1,7 +1,7 @@
-import type { PostSearchResult } from './posts'
-import type { TagSearchResult } from './tags'
+import type { Post } from './posts'
+import type { Tag } from './tags'
 
 export interface SearchResponse {
-  posts: PostSearchResult[]
-  tags: TagSearchResult[]
+  posts: Post[]
+  tags: Tag[]
 }

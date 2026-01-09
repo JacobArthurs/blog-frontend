@@ -32,10 +32,3 @@ export interface PostUpdate {
   tag_ids?: number[]
   featured?: boolean
 }
-
-export interface PostSearchResult {
-  id: number
-  title: string
-  slug: string
-  created_at: string
-}
