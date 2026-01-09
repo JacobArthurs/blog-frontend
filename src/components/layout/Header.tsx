@@ -40,7 +40,7 @@ function Header() {
           >
             <Search size={20} className="text-muted-foreground size-5" />
             <span className="text-sm text-muted-foreground">
-              Search posts...
+              Search blog posts and tags...
             </span>
           </Button>
         </div>

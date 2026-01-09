@@ -49,7 +49,7 @@ export function PostCard({ post, isFeatured = false }: PostCardProps) {
       <CardContent className="flex flex-col justify-between h-full">
         <div>
           {isFeatured ? <h1>{post.title}</h1> : <h3>{post.title}</h3>}
-          <p className="my-8">{post.summary}</p>
+          <p className="my-8 text-muted-foreground">{post.summary}</p>
         </div>
         <div className="flex flex-col gap-4">
           <div className="flex flex-wrap flex-col sm:flex-row sm:items-center gap-4">
