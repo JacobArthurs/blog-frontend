@@ -104,7 +104,7 @@ function Tag() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-8 mt-16">
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2">
             <TagIcon size={28} />
@@ -140,7 +140,7 @@ function Tag() {
   }
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8 mt-16">
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2">
           <TagIcon size={28} />
