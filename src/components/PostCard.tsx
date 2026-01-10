@@ -13,7 +13,7 @@ interface PostCardProps {
 
 export function PostCard({ post, isFeatured = false }: PostCardProps) {
   const cardRef = useRef<HTMLDivElement>(null)
-  const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 })
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const navigate = useNavigate()
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -38,7 +38,7 @@ export function PostCard({ post, isFeatured = false }: PostCardProps) {
     <Card
       ref={cardRef}
       onMouseMove={handleMouseMove}
-      className="relative overflow-hidden transition-transform duration-300 ease-in-out hover:-translate-y-1 hover:shadow-2xl post-card"
+      className="relative min-h-100 overflow-hidden transition-transform duration-300 ease-in-out hover:-translate-y-1 hover:shadow-2xl post-card"
       style={
         {
           '--mouse-x': `${mousePosition.x}%`,
@@ -73,7 +73,7 @@ export function PostCard({ post, isFeatured = false }: PostCardProps) {
               <Badge
                 key={tag.id}
                 variant="secondary"
-                className="py-1 px-3 text-base cursor-pointer hover:bg-secondary/80 transition-colors"
+                className="py-1 px-3 gap-2 text-base cursor-pointer hover:bg-secondary/80 transition-colors"
                 onClick={() => handleTagClick(tag.slug)}
               >
                 <TagIcon />
