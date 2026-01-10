@@ -10,6 +10,8 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Spinner } from '@/components/ui/spinner'
 import { apiClient } from '@/services/api'
 import type { SearchResponse } from '@/types/search'
 import {
@@ -19,7 +21,6 @@ import {
   EmptyMedia,
   EmptyTitle
 } from './ui/empty'
-import { Spinner } from './ui/spinner'
 
 interface SearchModalProps {
   isOpen: boolean
@@ -144,94 +145,90 @@ function SearchModal({ isOpen, onClose }: SearchModalProps) {
           autoFocus
         />
 
-        <div className="mt-4 flex-1 overflow-y-auto">
-          {!query && (
-            <div className="text-center py-8 text-muted-foreground">
-              Start typing to search...
-            </div>
+        {!query && (
+          <div className="text-center py-8 text-muted-foreground">
+            Start typing to search...
+          </div>
+        )}
+
+        {query &&
+          results &&
+          results.posts.length == 0 &&
+          results.tags.length == 0 && (
+            <Empty>
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <FolderX />
+                </EmptyMedia>
+                <EmptyTitle>No Results Found</EmptyTitle>
+                <EmptyDescription>
+                  No blog posts or tags match your search. Try different
+                  keywords or check your spelling.
+                </EmptyDescription>
+              </EmptyHeader>
+            </Empty>
           )}
 
-          {query &&
-            results &&
-            results.posts.length == 0 &&
-            results.tags.length == 0 && (
-              <Empty>
-                <EmptyHeader>
-                  <EmptyMedia variant="icon">
-                    <FolderX />
-                  </EmptyMedia>
-                  <EmptyTitle>No Results Found</EmptyTitle>
-                  <EmptyDescription>
-                    No blog posts or tags match your search. Try different
-                    keywords or check your spelling.
-                  </EmptyDescription>
-                </EmptyHeader>
-              </Empty>
-            )}
-
-          {query &&
-            results &&
-            (results.posts.length > 0 || results.tags.length > 0) && (
-              <div className="space-y-6">
-                {results.tags.length > 0 && (
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <Tag size={28} />
-                      <p className="text-lg font-bold">Tags</p>
-                    </div>
-                    <div className="mt-4">
-                      {results.tags.map((tag) => (
-                        <button
-                          key={tag.id}
-                          onClick={() => handleTagClick(tag.slug)}
-                          className="w-full text-left px-3 py-2 hover:bg-accent transition-colors cursor-pointer"
-                        >
-                          <div className="font-medium">{tag.name}</div>
-                        </button>
-                      ))}
-                    </div>
+        {query &&
+          results &&
+          (results.posts.length > 0 || results.tags.length > 0) && (
+            <ScrollArea className="w-full h-[50vh]">
+              {results.tags.length > 0 && (
+                <div className="mt-4">
+                  <div className="flex items-center gap-2">
+                    <Tag size={28} />
+                    <p className="text-lg font-bold">Tags</p>
                   </div>
-                )}
-
-                {results.posts.length > 0 && (
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <FileText size={28} />
-                      <p className="text-lg font-bold">Blog Posts</p>
-                    </div>
-                    <div className="mt-4">
-                      {results.posts.map((post) => (
-                        <button
-                          key={post.id}
-                          onClick={() => handlePostClick(post.slug)}
-                          className="w-full text-left px-3 py-2 hover:bg-accent transition-colors cursor-pointer"
-                        >
-                          <div className="font-medium">{post.title}</div>
-                          <div className="text-sm text-muted-foreground line-clamp-1">
-                            {post.summary}
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                    {hasMorePosts && (
-                      <div className="mt-4 flex justify-center">
-                        <Button
-                          onClick={loadMorePosts}
-                          disabled={isLoadingMore}
-                          variant="outline"
-                        >
-                          {isLoadingMore
-                            ? 'Loading...'
-                            : 'Show more blog posts'}
-                          {isLoadingMore ? <Spinner /> : <ArrowDown />}
-                        </Button>
-                      </div>
-                    )}
+                  <div className="mt-4">
+                    {results.tags.map((tag) => (
+                      <button
+                        key={tag.id}
+                        onClick={() => handleTagClick(tag.slug)}
+                        className="w-full text-left px-3 py-2 hover:bg-accent transition-colors cursor-pointer rounded-md"
+                      >
+                        <div className="font-medium">{tag.name}</div>
+                      </button>
+                    ))}
                   </div>
-                )}
-              </div>
-            )}
-        </div>
+                </div>
+              )}
+
+              {results.posts.length > 0 && (
+                <div className="mt-4">
+                  <div className="flex items-center gap-2">
+                    <FileText size={28} />
+                    <p className="text-lg font-bold">Blog Posts</p>
+                  </div>
+                  <div className="mt-4">
+                    {results.posts.map((post) => (
+                      <button
+                        key={post.id}
+                        onClick={() => handlePostClick(post.slug)}
+                        className="w-full text-left px-3 py-2 hover:bg-accent transition-colors cursor-pointer rounded-md"
+                      >
+                        <div className="font-medium">{post.title}</div>
+                        <div className="text-sm text-muted-foreground line-clamp-1">
+                          {post.summary}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                  {hasMorePosts && (
+                    <div className="mt-4 flex justify-center">
+                      <Button
+                        onClick={loadMorePosts}
+                        disabled={isLoadingMore}
+                        variant="outline"
+                      >
+                        {isLoadingMore ? 'Loading...' : 'Show more blog posts'}
+                        {isLoadingMore ? <Spinner /> : <ArrowDown />}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </ScrollArea>
+          )}
       </DialogContent>
     </Dialog>
   )
