@@ -5,6 +5,7 @@ import type { Post } from '@/types'
 import { Calendar, Clock, Eye, Hash, MoveRight } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { TimeAgo } from './TimeAgo'
 
 interface PostCardProps {
   post: Post
@@ -55,13 +56,7 @@ export function PostCard({ post, isFeatured = false }: PostCardProps) {
           <div className="flex flex-wrap flex-col sm:flex-row sm:items-center gap-4">
             <div className="flex items-center gap-2">
               <Calendar size={20} />
-              <span>
-                {new Date(post.created_at).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric'
-                })}
-              </span>
+              <TimeAgo dateString={post.created_at} />
             </div>
             <p className="hidden sm:block">•</p>
             <div className="flex items-center gap-2">
