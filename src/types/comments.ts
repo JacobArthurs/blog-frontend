@@ -6,6 +6,7 @@ export interface Comment {
   author_name: string
   author_email: string
   content: string
+  like_count: number
   created_at: string
   replies: Comment[]
 }
