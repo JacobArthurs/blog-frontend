@@ -13,10 +13,13 @@ export class ApiClient {
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`
 
+    const token = sessionStorage.getItem('access_token')
+
     const config: RequestInit = {
       ...options,
       headers: {
         'Content-Type': 'application/json',
+        ...(token && { Authorization: `Bearer ${token}` }),
         ...options?.headers
       }
     }
@@ -44,10 +47,24 @@ export class ApiClient {
     return this.request<T>(endpoint, { method: 'GET' })
   }
 
-  async post<T>(endpoint: string, data: unknown): Promise<T> {
+  async post<T>(
+    endpoint: string,
+    data: unknown,
+    contentType:
+      | 'application/json'
+      | 'application/x-www-form-urlencoded' = 'application/json'
+  ): Promise<T> {
+    const body =
+      contentType === 'application/x-www-form-urlencoded'
+        ? new URLSearchParams(data as Record<string, string>).toString()
+        : JSON.stringify(data)
+
     return this.request<T>(endpoint, {
       method: 'POST',
-      body: JSON.stringify(data)
+      headers: {
+        'Content-Type': contentType
+      },
+      body
     })
   }
 
