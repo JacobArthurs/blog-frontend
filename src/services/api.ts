@@ -1,3 +1,5 @@
+import { toast } from 'sonner'
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 export class ApiClient {
@@ -28,8 +30,14 @@ export class ApiClient {
 
     if (!response.ok) {
       const errorBody = await response.json().catch(() => null)
+      const errorMessage =
+        errorBody?.detail ||
+        'Sorry, something went wrong. Please try again later.'
+
+      toast.error(errorMessage)
+
       throw {
-        message: 'An error occurred',
+        message: errorMessage,
         statusCode: response.status,
         ...errorBody
       }
