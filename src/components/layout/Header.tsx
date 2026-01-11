@@ -30,7 +30,7 @@ function Header() {
       <div className="container mx-auto px-4 py-4 flex justify-between">
         <div className="flex items-center gap-8">
           <Link to="/">
-            <Logo className="h-9 w-9" />
+            <Logo className="h-9 w-9 hover:fill-primary transition-colors ease-in-out duration-200" />
           </Link>
 
           {/* Search Button */}
