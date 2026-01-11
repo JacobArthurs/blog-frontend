@@ -6,6 +6,7 @@ import LoginPage from '@/pages/public/Login'
 import AdminPostPage from '@/pages/admin/Post'
 import AdminTagPage from '@/pages/admin/Tag'
 import Admin from '@/pages/admin/Admin/Admin'
+import { ProtectedRoute } from '@/components/ProtectedRoute'
 
 export const routes = [
   {
@@ -26,15 +27,27 @@ export const routes = [
   },
   {
     path: '/admin',
-    element: <Admin />
+    element: (
+      <ProtectedRoute>
+        <Admin />
+      </ProtectedRoute>
+    )
   },
   {
     path: '/admin/post/:id?',
-    element: <AdminPostPage />
+    element: (
+      <ProtectedRoute>
+        <AdminPostPage />
+      </ProtectedRoute>
+    )
   },
   {
     path: '/admin/tag/:id?',
-    element: <AdminTagPage />
+    element: (
+      <ProtectedRoute>
+        <AdminTagPage />
+      </ProtectedRoute>
+    )
   },
   {
     path: '*',
