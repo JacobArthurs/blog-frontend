@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { apiClient } from '@/services/api'
-import type { Post, Tag } from '@/types'
+import type { PaginatedResponse, Post, Tag } from '@/types'
 import { PostCard } from '@/components/PostCard'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
@@ -35,19 +35,19 @@ function Tag() {
       try {
         const [tagData, postsData] = await Promise.all([
           apiClient.get<Tag>(`/tags/slug/${slug}`),
-          apiClient.get<Post[]>(
-            `/posts/tag/${slug}?skip=0&limit=${POSTS_PER_PAGE}`
+          apiClient.get<PaginatedResponse<Post>>(
+            `/posts/tag/${slug}?offset=0&limit=${POSTS_PER_PAGE}`
           )
         ])
 
-        if (!tagData || postsData.length === 0) {
+        if (!tagData || postsData.items.length === 0) {
           navigate('/404', { replace: true })
           return
         }
 
         setTag(tagData)
-        setPosts(postsData)
-        setHasMore(postsData.length === POSTS_PER_PAGE)
+        setPosts(postsData.items)
+        setHasMore(postsData.items.length === POSTS_PER_PAGE)
         setPage(1)
       } catch (err) {
         console.error('Error fetching data:', err)
@@ -66,12 +66,12 @@ function Tag() {
     setIsLoadingMore(true)
     try {
       const skip = page * POSTS_PER_PAGE
-      const morePosts = await apiClient.get<Post[]>(
-        `/posts/tag/${slug}?skip=${skip}&limit=${POSTS_PER_PAGE}`
+      const morePosts = await apiClient.get<PaginatedResponse<Post>>(
+        `/posts/tag/${slug}?offset=${skip}&limit=${POSTS_PER_PAGE}`
       )
 
-      setPosts((prev) => [...prev, ...morePosts])
-      setHasMore(morePosts.length === POSTS_PER_PAGE)
+      setPosts((prev) => [...prev, ...morePosts.items])
+      setHasMore(morePosts.items.length === POSTS_PER_PAGE)
       setPage((prev) => prev + 1)
     } catch (err) {
       console.error('Error loading more posts:', err)

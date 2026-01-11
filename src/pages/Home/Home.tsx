@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { apiClient } from '@/services/api'
-import type { Post } from '@/types'
+import type { PaginatedResponse, Post } from '@/types'
 import { PostCard } from '@/components/PostCard'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
@@ -11,7 +11,7 @@ function Home() {
   const [featuredPost, setFeaturedPost] = useState<Post>()
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false)
-  const [hasMore, setHasMore] = useState<boolean>(true)
+  const [hasMorePosts, setHasMorePosts] = useState<boolean>(true)
   const [page, setPage] = useState<number>(0)
   const observerTarget = useRef<HTMLDivElement>(null)
 
@@ -24,12 +24,14 @@ function Home() {
       try {
         const [featuredData, postsData] = await Promise.all([
           apiClient.get<Post>('/posts/featured'),
-          apiClient.get<Post[]>(`/posts/?skip=0&limit=${POSTS_PER_PAGE}`)
+          apiClient.get<PaginatedResponse<Post>>(
+            `/posts/?offset=0&limit=${POSTS_PER_PAGE}`
+          )
         ])
 
         setFeaturedPost(featuredData)
-        setPosts(postsData)
-        setHasMore(postsData.length === POSTS_PER_PAGE)
+        setPosts(postsData.items)
+        setHasMorePosts(postsData.items.length === POSTS_PER_PAGE)
         setPage(1)
       } catch (err) {
         console.error('Error fetching posts:', err)
@@ -42,29 +44,29 @@ function Home() {
   }, [])
 
   const loadMorePosts = useCallback(async () => {
-    if (isLoadingMore || !hasMore) return
+    if (isLoadingMore || !hasMorePosts) return
 
     setIsLoadingMore(true)
     try {
       const skip = page * POSTS_PER_PAGE
-      const morePosts = await apiClient.get<Post[]>(
-        `/posts/?skip=${skip}&limit=${POSTS_PER_PAGE}`
+      const morePosts = await apiClient.get<PaginatedResponse<Post>>(
+        `/posts/?offset=${skip}&limit=${POSTS_PER_PAGE}`
       )
 
-      setPosts((prev) => [...prev, ...morePosts])
-      setHasMore(morePosts.length === POSTS_PER_PAGE)
+      setPosts((prev) => [...prev, ...morePosts.items])
+      setHasMorePosts(morePosts.items.length === POSTS_PER_PAGE)
       setPage((prev) => prev + 1)
     } catch (err) {
       console.error('Error loading more posts:', err)
     } finally {
       setIsLoadingMore(false)
     }
-  }, [page, hasMore, isLoadingMore])
+  }, [page, hasMorePosts, isLoadingMore])
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoadingMore) {
+        if (entries[0].isIntersecting && hasMorePosts && !isLoadingMore) {
           loadMorePosts()
         }
       },
@@ -81,7 +83,7 @@ function Home() {
         observer.unobserve(currentTarget)
       }
     }
-  }, [hasMore, isLoadingMore, loadMorePosts])
+  }, [hasMorePosts, isLoadingMore, loadMorePosts])
 
   if (isLoading) {
     return (
