@@ -226,7 +226,7 @@ function SearchModal({ isOpen, onClose }: SearchModalProps) {
                   ))}
                 </div>
                 {posts.length < postsTotal && (
-                  <div className="mt-4 flex justify-center">
+                  <div className="mt-4 mb-2 flex justify-center">
                     <Button
                       onClick={loadMorePosts}
                       disabled={isLoadingPosts}
