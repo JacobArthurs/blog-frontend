@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Pagination,
   PaginationContent,
@@ -14,11 +16,12 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table'
-import { Post, Tag, PaginatedResponse } from '@/types'
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { apiClient } from '@/services/api'
 import { Button } from '@/components/ui/button'
+import { apiClient } from '@/services/api'
+import type { Post, Tag, PaginatedResponse } from '@/types'
+
+const POSTS_LIMIT = 10
+const TAGS_LIMIT = 10
 
 function Admin() {
   const navigate = useNavigate()
@@ -30,75 +33,102 @@ function Admin() {
   const [tagOffset, setTagOffset] = useState(0)
   const [tagTotal, setTagTotal] = useState(0)
 
-  const POSTS_LIMIT = 10
-  const TAGS_LIMIT = 10
+  const postCurrentPage = Math.floor(postOffset / POSTS_LIMIT) + 1
+  const postTotalPages = Math.ceil(postTotal / POSTS_LIMIT)
+  const tagCurrentPage = Math.floor(tagOffset / TAGS_LIMIT) + 1
+  const tagTotalPages = Math.ceil(tagTotal / TAGS_LIMIT)
 
-  // Page posts via limit and offset
-  const handlePostPageChange = async (newOffset: number) => {
+  const fetchPosts = async (offset: number) => {
     try {
       const data = await apiClient.get<PaginatedResponse<Post>>(
-        `/posts/?offset=${newOffset}&limit=${POSTS_LIMIT}`
+        `/posts/?offset=${offset}&limit=${POSTS_LIMIT}`
       )
       setPosts(data.items)
       setPostTotal(data.total)
-      setPostOffset(newOffset)
+      setPostOffset(offset)
     } catch (err) {
       console.error('Error fetching posts:', err)
     }
   }
 
-  // Page tags via limit and offset
-  const handleTagPageChange = async (newOffset: number) => {
+  const fetchTags = async (offset: number) => {
     try {
       const data = await apiClient.get<PaginatedResponse<Tag>>(
-        `/tags/?offset=${newOffset}&limit=${TAGS_LIMIT}`
+        `/tags/?offset=${offset}&limit=${TAGS_LIMIT}`
       )
       setTags(data.items)
       setTagTotal(data.total)
-      setTagOffset(newOffset)
+      setTagOffset(offset)
     } catch (err) {
       console.error('Error fetching tags:', err)
     }
   }
 
-  // Fetch initial data on mount
   useEffect(() => {
-    const fetchFeaturedPost = async () => {
+    const loadData = async () => {
       try {
-        const featuredData = await apiClient.get<Post>('/posts/featured')
+        const [featuredData] = await Promise.all([
+          apiClient.get<Post>('/posts/featured'),
+          fetchPosts(0),
+          fetchTags(0)
+        ])
         setFeaturedPost(featuredData)
       } catch (err) {
         console.error('Error fetching featured post:', err)
       }
     }
 
-    fetchFeaturedPost()
-    handlePostPageChange(0)
-    handleTagPageChange(0)
+    loadData()
   }, [])
 
-  const postCurrentPage = Math.floor(postOffset / POSTS_LIMIT) + 1
-  const postTotalPages = Math.ceil(postTotal / POSTS_LIMIT)
-  const tagCurrentPage = Math.floor(tagOffset / TAGS_LIMIT) + 1
-  const tagTotalPages = Math.ceil(tagTotal / TAGS_LIMIT)
-
-  const handleTagClick = (id?: number) => {
-    navigate(id ? `/admin/tag/${id}` : '/admin/tag')
-  }
-
-  const handlePostClick = (id?: number) => {
-    navigate(id ? `/admin/post/${id}` : '/admin/post')
-  }
+  const renderPagination = (
+    currentPage: number,
+    totalPages: number,
+    limit: number,
+    onPageChange: (offset: number) => void
+  ) => (
+    <Pagination>
+      <PaginationContent>
+        <PaginationItem>
+          <PaginationPrevious
+            onClick={() =>
+              currentPage > 1 && onPageChange((currentPage - 2) * limit)
+            }
+            className={
+              currentPage === 1 ? 'pointer-events-none opacity-50' : ''
+            }
+          />
+        </PaginationItem>
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+          <PaginationItem key={page}>
+            <PaginationLink
+              onClick={() => onPageChange((page - 1) * limit)}
+              isActive={page === currentPage}
+            >
+              {page}
+            </PaginationLink>
+          </PaginationItem>
+        ))}
+        <PaginationItem>
+          <PaginationNext
+            onClick={() =>
+              currentPage < totalPages && onPageChange(currentPage * limit)
+            }
+            className={
+              currentPage === totalPages ? 'pointer-events-none opacity-50' : ''
+            }
+          />
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
+  )
 
   return (
     <div className="flex flex-col gap-8">
       {tags.length > 0 && (
         <div className="flex flex-col gap-4">
           <h2 className="text-2xl font-bold">Tags</h2>
-          <Button
-            onClick={() => handleTagClick()}
-            className="w-fit cursor-pointer"
-          >
+          <Button onClick={() => navigate('/admin/tag')} className="w-fit">
             New Tag
           </Button>
           <Table>
@@ -114,7 +144,7 @@ function Admin() {
               {tags.map((tag) => (
                 <TableRow
                   key={tag.id}
-                  onClick={() => handleTagClick(tag.id)}
+                  onClick={() => navigate(`/admin/tag/${tag.id}`)}
                   className="cursor-pointer hover:bg-muted/50"
                 >
                   <TableCell>{tag.id}</TableCell>
@@ -127,61 +157,19 @@ function Admin() {
               ))}
             </TableBody>
           </Table>
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={() =>
-                    tagCurrentPage > 1 &&
-                    handleTagPageChange((tagCurrentPage - 2) * TAGS_LIMIT)
-                  }
-                  className={
-                    tagCurrentPage === 1
-                      ? 'pointer-events-none opacity-50'
-                      : 'cursor-pointer'
-                  }
-                />
-              </PaginationItem>
-              {Array.from({ length: tagTotalPages }, (_, i) => i + 1).map(
-                (page) => (
-                  <PaginationItem key={page}>
-                    <PaginationLink
-                      onClick={() =>
-                        handleTagPageChange((page - 1) * TAGS_LIMIT)
-                      }
-                      isActive={page === tagCurrentPage}
-                      className="cursor-pointer"
-                    >
-                      {page}
-                    </PaginationLink>
-                  </PaginationItem>
-                )
-              )}
-              <PaginationItem>
-                <PaginationNext
-                  onClick={() =>
-                    tagCurrentPage < tagTotalPages &&
-                    handleTagPageChange(tagCurrentPage * TAGS_LIMIT)
-                  }
-                  className={
-                    tagCurrentPage === tagTotalPages
-                      ? 'pointer-events-none opacity-50'
-                      : 'cursor-pointer'
-                  }
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
+          {renderPagination(
+            tagCurrentPage,
+            tagTotalPages,
+            TAGS_LIMIT,
+            fetchTags
+          )}
         </div>
       )}
 
       {posts.length > 0 && (
         <div className="flex flex-col gap-4">
           <h2 className="text-2xl font-bold">Posts</h2>
-          <Button
-            onClick={() => handlePostClick()}
-            className="w-fit cursor-pointer"
-          >
+          <Button onClick={() => navigate('/admin/post')} className="w-fit">
             New Post
           </Button>
           <Table>
@@ -199,7 +187,7 @@ function Admin() {
               {featuredPost && (
                 <TableRow
                   key={featuredPost.id}
-                  onClick={() => handlePostClick(featuredPost.id)}
+                  onClick={() => navigate(`/admin/post/${featuredPost.id}`)}
                   className="bg-primary text-primary-foreground cursor-pointer hover:bg-primary/90"
                 >
                   <TableCell>{featuredPost.id}</TableCell>
@@ -215,7 +203,7 @@ function Admin() {
               {posts.map((post) => (
                 <TableRow
                   key={post.id}
-                  onClick={() => handlePostClick(post.id)}
+                  onClick={() => navigate(`/admin/post/${post.id}`)}
                   className="cursor-pointer hover:bg-muted/50"
                 >
                   <TableCell>{post.id}</TableCell>
@@ -230,51 +218,12 @@ function Admin() {
               ))}
             </TableBody>
           </Table>
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={() =>
-                    postCurrentPage > 1 &&
-                    handlePostPageChange((postCurrentPage - 2) * POSTS_LIMIT)
-                  }
-                  className={
-                    postCurrentPage === 1
-                      ? 'pointer-events-none opacity-50'
-                      : 'cursor-pointer'
-                  }
-                />
-              </PaginationItem>
-              {Array.from({ length: postTotalPages }, (_, i) => i + 1).map(
-                (page) => (
-                  <PaginationItem key={page}>
-                    <PaginationLink
-                      onClick={() =>
-                        handlePostPageChange((page - 1) * POSTS_LIMIT)
-                      }
-                      isActive={page === postCurrentPage}
-                      className="cursor-pointer"
-                    >
-                      {page}
-                    </PaginationLink>
-                  </PaginationItem>
-                )
-              )}
-              <PaginationItem>
-                <PaginationNext
-                  onClick={() =>
-                    postCurrentPage < postTotalPages &&
-                    handlePostPageChange(postCurrentPage * POSTS_LIMIT)
-                  }
-                  className={
-                    postCurrentPage === postTotalPages
-                      ? 'pointer-events-none opacity-50'
-                      : 'cursor-pointer'
-                  }
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
+          {renderPagination(
+            postCurrentPage,
+            postTotalPages,
+            POSTS_LIMIT,
+            fetchPosts
+          )}
         </div>
       )}
     </div>
