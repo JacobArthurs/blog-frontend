@@ -2,7 +2,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import type { Post } from '@/types'
-import { Calendar, Clock, Eye, MoveRight, TagIcon } from 'lucide-react'
+import { Calendar, Clock, Eye, Hash, MoveRight } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
@@ -55,7 +55,13 @@ export function PostCard({ post, isFeatured = false }: PostCardProps) {
           <div className="flex flex-wrap flex-col sm:flex-row sm:items-center gap-4">
             <div className="flex items-center gap-2">
               <Calendar size={20} />
-              <span>{new Date(post.created_at).toLocaleDateString()}</span>
+              <span>
+                {new Date(post.created_at).toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric'
+                })}
+              </span>
             </div>
             <p className="hidden sm:block">•</p>
             <div className="flex items-center gap-2">
@@ -73,10 +79,10 @@ export function PostCard({ post, isFeatured = false }: PostCardProps) {
               <Badge
                 key={tag.id}
                 variant="secondary"
-                className="py-1 px-3 gap-2 text-base cursor-pointer hover:bg-secondary/80 transition-colors"
+                className="py-2 px-3 gap-2 text-base cursor-pointer hover:bg-secondary/80 transition-colors"
                 onClick={() => handleTagClick(tag.slug)}
               >
-                <TagIcon />
+                <Hash size={14} />
                 {tag.name}
               </Badge>
             ))}
