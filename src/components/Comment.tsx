@@ -135,25 +135,29 @@ export function Comment({ comment }: CommentProps) {
       </div>
 
       {comment.replies.length > 0 && (
-        <Accordion type="multiple" defaultValue={['replies']} className="ml-14">
+        <Accordion
+          type="multiple"
+          defaultValue={['replies']}
+          className="ml-4 sm:ml-8 md:ml-14"
+        >
           <AccordionItem value="replies" className="border-none group">
-            <AccordionTrigger className="hover:no-underline [&>svg]:hidden [&[data-state=open]_svg]:rotate-180 p-0 my-2">
-              <Button className="w-fit cursor-pointer" variant="ghost">
-                <ChevronDown
-                  size={16}
-                  className="transition-transform duration-200"
-                />
-                {comment.replies.length}
-                &nbsp;
-                {comment.replies.length === 1 ? 'reply' : 'replies'}
+            <AccordionTrigger className="hover:no-underline [&>svg]:hidden [&[data-state=open]_svg]:rotate-180 p-0 mt-2 mb-3">
+              <Button className="w-fit cursor-pointer" variant="ghost" asChild>
+                <span>
+                  <ChevronDown
+                    size={16}
+                    className="transition-transform duration-200"
+                  />
+                  {comment.replies.length}
+                  &nbsp;
+                  {comment.replies.length === 1 ? 'reply' : 'replies'}
+                </span>
               </Button>
             </AccordionTrigger>
             <AccordionContent>
-              <div className="space-y-4 pt-2">
-                {comment.replies.map((reply) => (
-                  <Comment key={reply.id} comment={reply} />
-                ))}
-              </div>
+              {comment.replies.map((reply) => (
+                <Comment key={reply.id} comment={reply} />
+              ))}
             </AccordionContent>
           </AccordionItem>
         </Accordion>

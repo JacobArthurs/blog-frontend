@@ -55,18 +55,20 @@ export function PostCard({ post, isFeatured = false }: PostCardProps) {
         <div className="flex flex-col gap-4">
           <div className="flex flex-wrap flex-col sm:flex-row sm:items-center gap-4">
             <div className="flex items-center gap-2">
-              <Calendar size={20} />
-              <TimeAgo dateString={post.created_at} />
+              <Calendar size={16} />
+              <TimeAgo dateString={post.created_at} className="text-base" />
             </div>
             <p className="hidden sm:block">•</p>
             <div className="flex items-center gap-2">
-              <Clock size={20} />
-              <span>{post.read_time_minutes} min. read</span>
+              <Clock size={16} />
+              <span className="text-base">
+                {post.read_time_minutes} min. read
+              </span>
             </div>
             <p className="hidden sm:block">•</p>
             <div className="flex items-center gap-2">
-              <Eye size={20} />
-              <span>{post.view_count} views</span>
+              <Eye size={16} />
+              <span className="text-base">{post.view_count} views</span>
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
