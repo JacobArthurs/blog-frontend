@@ -1,7 +1,8 @@
 export interface Comment {
   id: number
   post_id: number
-  parent_id: number | null
+  parent_id?: number
+  depth: number
   author_name: string
   author_email: string
   content: string
@@ -11,7 +12,7 @@ export interface Comment {
 
 export interface CommentCreate {
   post_id: number
-  parent_id?: number | null
+  parent_id?: number
   author_name: string
   author_email: string
   content: string

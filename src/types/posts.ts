@@ -12,6 +12,7 @@ export interface Post {
   created_at: string
   updated_at: string
   tags: Tag[]
+  comment_count: number
 }
 
 export interface PostCreate {
