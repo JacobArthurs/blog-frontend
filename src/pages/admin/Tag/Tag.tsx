@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/field'
 import { apiClient } from '@/services/api'
 import type { Tag, TagCreate, TagUpdate } from '@/types/tags'
+import { toast } from 'sonner'
 
 const formSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -80,6 +81,7 @@ function TagPage() {
         }
         await apiClient.post('/tags', createData)
       }
+      toast.success('Tag saved successfully')
       navigate('/admin')
     } catch (error) {
       console.error('Failed to save tag:', error)

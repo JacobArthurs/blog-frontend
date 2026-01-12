@@ -40,6 +40,8 @@ import { cn } from '@/lib/utils'
 import type { Post, PostCreate, PostUpdate } from '@/types/posts'
 import type { Tag } from '@/types/tags'
 import type { Comment } from '@/types/comments'
+import { toast } from 'sonner'
+import { RichTextEditor } from '@/components/RichTextEditor'
 
 const formSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -133,6 +135,7 @@ function PostPage() {
         }
         await apiClient.post('/posts', createData)
       }
+      toast.success('Post saved successfully')
       navigate('/admin')
     } catch (error) {
       console.error('Failed to save post:', error)
@@ -385,11 +388,10 @@ function PostPage() {
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="form-post-content">Content</FieldLabel>
-                    <Textarea
-                      {...field}
-                      id="form-post-content"
-                      autoComplete="off"
-                      disabled={isLoading}
+                    <RichTextEditor
+                      content={field.value}
+                      onChange={field.onChange}
+                      editable={!isLoading}
                     />
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
