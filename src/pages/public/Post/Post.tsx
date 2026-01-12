@@ -21,8 +21,6 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Card, CardContent } from '@/components/ui/card'
-import { Textarea } from '@/components/ui/textarea'
-import { Button } from '@/components/ui/button'
 import { Comment } from '@/components/Comment'
 import {
   Empty,
@@ -32,6 +30,7 @@ import {
   EmptyTitle
 } from '@/components/ui/empty'
 import { TimeAgo } from '@/components/TimeAgo'
+import { CreateComment } from '@/components/CreateComment'
 
 function Post() {
   const { slug } = useParams()
@@ -47,7 +46,7 @@ function Post() {
   const [commentOffset, setCommentOffset] = useState<number>(0)
   const observerTarget = useRef<HTMLDivElement>(null)
 
-  const COMMENTS_LIMIT = 5
+  const COMMENTS_LIMIT = 10
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -78,32 +77,32 @@ function Post() {
     fetchPost()
   }, [slug, navigate])
 
-  useEffect(() => {
-    const fetchComments = async () => {
-      if (!post?.id) return
+  const fetchComments = useCallback(async () => {
+    if (!post?.id) return
 
-      setIsCommentLoading(true)
-      setComments([])
-      setCommentOffset(0)
-      setHasMoreComments(true)
+    setIsCommentLoading(true)
+    setComments([])
+    setCommentOffset(0)
+    setHasMoreComments(true)
 
-      try {
-        const commentsData = await apiClient.get<
-          PaginatedResponse<CommentType>
-        >(`/comments/post/${post.id}?offset=0&limit=${COMMENTS_LIMIT}`)
-        setComments(commentsData.items)
-        setCommentsTotal(commentsData.total)
-        setHasMoreComments(commentsData.total > commentsData.items.length)
-        setCommentOffset(COMMENTS_LIMIT)
-      } catch (err) {
-        console.error('Error fetching comments:', err)
-      } finally {
-        setIsCommentLoading(false)
-      }
+    try {
+      const commentsData = await apiClient.get<PaginatedResponse<CommentType>>(
+        `/comments/post/${post.id}?offset=0&limit=${COMMENTS_LIMIT}`
+      )
+      setComments(commentsData.items)
+      setCommentsTotal(commentsData.total)
+      setHasMoreComments(commentsData.total > commentsData.items.length)
+      setCommentOffset(COMMENTS_LIMIT)
+    } catch (err) {
+      console.error('Error fetching comments:', err)
+    } finally {
+      setIsCommentLoading(false)
     }
-
-    fetchComments()
   }, [post?.id])
+
+  useEffect(() => {
+    fetchComments()
+  }, [fetchComments, post?.id])
 
   const loadMoreComments = useCallback(async () => {
     if (isLoadingMoreComments || !hasMoreComments || !post?.id) return
@@ -288,13 +287,13 @@ function Post() {
           <MessageCircle size={28} />
           <p className="text-lg font-bold">{post.comment_count} Comments</p>
         </div>
-        <Textarea placeholder="Add a comment..." />
-        <div className="flex gap-4 justify-end">
-          <Button variant="outline" className="w-fit">
-            Cancel
-          </Button>
-          <Button className="w-fit">Submit</Button>
-        </div>
+        <CreateComment
+          postId={post.id}
+          isReply={false}
+          onSubmit={() => {
+            fetchComments()
+          }}
+        />
         <div className="flex flex-col gap-4">
           {isCommentLoading ? (
             <>
@@ -318,7 +317,11 @@ function Post() {
           ) : (
             <>
               {comments.map((comment) => (
-                <Comment key={comment.id} comment={comment} />
+                <Comment
+                  key={comment.id}
+                  comment={comment}
+                  onRefresh={fetchComments}
+                />
               ))}
 
               {isLoadingMoreComments && (

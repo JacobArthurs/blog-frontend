@@ -1,6 +1,7 @@
 import { Comment as CommentType } from '@/types/comments'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
+import DOMPurify from 'dompurify'
 import {
   Tooltip,
   TooltipTrigger,
@@ -17,13 +18,17 @@ import CryptoJS from 'crypto-js'
 import { ChevronDown, ThumbsDown, ThumbsUp } from 'lucide-react'
 import { apiClient } from '@/services/api'
 import { useState } from 'react'
+import { CreateComment } from '@/components/CreateComment'
+import { toast } from 'sonner'
 
 interface CommentProps {
   comment: CommentType
+  onRefresh?: () => void | Promise<void>
 }
 
-export function Comment({ comment }: CommentProps) {
+export function Comment({ comment, onRefresh }: CommentProps) {
   const [likeCount, setLikeCount] = useState(comment.like_count)
+  const [isReplying, setIsReplying] = useState(false)
 
   const getInitials = (name: string) => {
     const parts = name.trim().split(' ')
@@ -60,7 +65,23 @@ export function Comment({ comment }: CommentProps) {
   }
 
   const handleReply = () => {
-    // Implement reply functionality here
+    if (comment.depth >= 4) {
+      toast.info(
+        'Maximum reply depth reached. Try replying to a parent comment instead.'
+      )
+      return
+    }
+
+    setIsReplying(true)
+  }
+
+  const handleReplySubmit = async () => {
+    setIsReplying(false)
+    await onRefresh?.()
+  }
+
+  const handleReplyCancel = () => {
+    setIsReplying(false)
   }
 
   return (
@@ -87,7 +108,12 @@ export function Comment({ comment }: CommentProps) {
             />
           </div>
 
-          <p className="text-sm mb-2">{comment.content}</p>
+          <div
+            className="ProseMirror-comment mb-2"
+            dangerouslySetInnerHTML={{
+              __html: DOMPurify.sanitize(comment.content)
+            }}
+          />
 
           <div className="flex items-center">
             <Tooltip>
@@ -134,6 +160,18 @@ export function Comment({ comment }: CommentProps) {
         </div>
       </div>
 
+      {isReplying && (
+        <div className="ml-4 sm:ml-8 md:ml-14 mt-4">
+          <CreateComment
+            postId={comment.post_id}
+            parentId={comment.id}
+            isReply={true}
+            onSubmit={handleReplySubmit}
+            onCancel={handleReplyCancel}
+          />
+        </div>
+      )}
+
       {comment.replies.length > 0 && (
         <Accordion
           type="multiple"
@@ -156,7 +194,7 @@ export function Comment({ comment }: CommentProps) {
             </AccordionTrigger>
             <AccordionContent>
               {comment.replies.map((reply) => (
-                <Comment key={reply.id} comment={reply} />
+                <Comment key={reply.id} comment={reply} onRefresh={onRefresh} />
               ))}
             </AccordionContent>
           </AccordionItem>
