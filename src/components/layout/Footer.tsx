@@ -69,7 +69,7 @@ function Footer() {
                 <TooltipTrigger asChild>
                   <Button variant="ghost" asChild>
                     <a
-                      href="https://api.jacobarthurs.com/blog-api/rss.xml"
+                      href={`${import.meta.env.VITE_API_BASE_URL}/rss.xml`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
