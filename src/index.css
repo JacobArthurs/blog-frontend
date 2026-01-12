@@ -304,3 +304,16 @@ h3 {
     margin: 1.5rem auto;
   }
 }
+
+.tiptap {
+  outline: none;
+  padding: 24px;
+}
+
+.tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: var(--muted-foreground);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}

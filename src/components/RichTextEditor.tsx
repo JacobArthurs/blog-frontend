@@ -3,6 +3,7 @@ import StarterKit from '@tiptap/starter-kit'
 import CodeBlock from '@tiptap/extension-code-block'
 import Link from '@tiptap/extension-link'
 import Image from '@tiptap/extension-image'
+import Placeholder from '@tiptap/extension-placeholder'
 import {
   Bold,
   Italic,
@@ -35,19 +36,52 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useState, useEffect } from 'react'
 import type { UploadResponse } from '@/types/uploads'
 import { toast } from 'sonner'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger
+} from '@/components/ui/tooltip'
+
+interface RichTextEditorConfig {
+  enableImages?: boolean
+  enableLinks?: boolean
+  enableHeadings?: boolean
+  enableCodeBlocks?: boolean
+  enableInlineCode?: boolean
+  enableLists?: boolean
+  enableBlockquote?: boolean
+  enableBold?: boolean
+  enableItalic?: boolean
+  enableStrike?: boolean
+}
 
 interface RichTextEditorProps {
   content?: string
   onChange?: (content: string) => void
   placeholder?: string
   editable?: boolean
+  config?: RichTextEditorConfig
 }
 
 export function RichTextEditor({
   content,
   onChange,
-  editable = true
+  placeholder,
+  editable = true,
+  config = {}
 }: RichTextEditorProps) {
+  const {
+    enableImages = true,
+    enableLinks = true,
+    enableHeadings = true,
+    enableCodeBlocks = true,
+    enableInlineCode = true,
+    enableLists = true,
+    enableBlockquote = true,
+    enableBold = true,
+    enableItalic = true,
+    enableStrike = true
+  } = config
   const [imageDialogOpen, setImageDialogOpen] = useState(false)
   const [imageUrl, setImageUrl] = useState('')
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -56,15 +90,34 @@ export function RichTextEditor({
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        codeBlock: false
+        codeBlock: false,
+        heading: enableHeadings ? undefined : false,
+        bulletList: enableLists ? undefined : false,
+        orderedList: enableLists ? undefined : false,
+        blockquote: enableBlockquote ? undefined : false,
+        bold: enableBold ? undefined : false,
+        italic: enableItalic ? undefined : false,
+        strike: enableStrike ? undefined : false,
+        code: enableInlineCode ? undefined : false
       }),
-      CodeBlock,
-      Link.configure({
-        openOnClick: false
+      Placeholder.configure({
+        placeholder: placeholder || 'Write something...'
       }),
-      Image.configure({
-        inline: true
-      })
+      ...(enableCodeBlocks ? [CodeBlock] : []),
+      ...(enableLinks
+        ? [
+            Link.configure({
+              openOnClick: false
+            })
+          ]
+        : []),
+      ...(enableImages
+        ? [
+            Image.configure({
+              inline: true
+            })
+          ]
+        : [])
     ],
     content,
     editable,
@@ -168,112 +221,149 @@ export function RichTextEditor({
     icon: React.ComponentType<{ size: number }>
     title: string
   }) => (
-    <Button
-      type="button"
-      variant={active ? 'default' : 'ghost'}
-      size="sm"
-      onClick={onClick}
-      title={title}
-      className="h-8 w-8 p-0"
-    >
-      <Icon size={16} />
-    </Button>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          type="button"
+          variant={active ? 'default' : 'ghost'}
+          size="sm"
+          onClick={onClick}
+          title={title}
+          className="h-8 w-8 p-0 cursor-pointer"
+        >
+          <Icon size={16} />
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>{title}</TooltipContent>
+    </Tooltip>
   )
 
   return (
     <div className="border rounded-lg overflow-hidden bg-background">
       {/* Toolbar */}
       <div className="border-b bg-muted p-2 flex flex-wrap gap-1">
-        <ToolbarButton
-          onClick={() => editor.chain().focus().toggleBold().run()}
-          active={editor.isActive('bold')}
-          icon={Bold}
-          title="Bold (Ctrl+B)"
-        />
-        <ToolbarButton
-          onClick={() => editor.chain().focus().toggleItalic().run()}
-          active={editor.isActive('italic')}
-          icon={Italic}
-          title="Italic (Ctrl+I)"
-        />
-        <ToolbarButton
-          onClick={() => editor.chain().focus().toggleStrike().run()}
-          active={editor.isActive('strike')}
-          icon={Strikethrough}
-          title="Strikethrough"
-        />
-        <ToolbarButton
-          onClick={() => editor.chain().focus().toggleCode().run()}
-          active={editor.isActive('code')}
-          icon={Code}
-          title="Inline Code"
-        />
-        <ToolbarButton
-          onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-          active={editor.isActive('codeBlock')}
-          icon={FileCode}
-          title="Code Block"
-        />
-        <ToolbarButton
-          onClick={setLink}
-          active={editor.isActive('link')}
-          icon={LinkIcon}
-          title="Add Link"
-        />
-        <ToolbarButton
-          onClick={addImage}
-          active={editor.isActive('image')}
-          icon={ImageIcon}
-          title="Add Image"
-        />
+        {enableBold && (
+          <ToolbarButton
+            onClick={() => editor.chain().focus().toggleBold().run()}
+            active={editor.isActive('bold')}
+            icon={Bold}
+            title="Bold (Ctrl+B)"
+          />
+        )}
+        {enableItalic && (
+          <ToolbarButton
+            onClick={() => editor.chain().focus().toggleItalic().run()}
+            active={editor.isActive('italic')}
+            icon={Italic}
+            title="Italic (Ctrl+I)"
+          />
+        )}
+        {enableStrike && (
+          <ToolbarButton
+            onClick={() => editor.chain().focus().toggleStrike().run()}
+            active={editor.isActive('strike')}
+            icon={Strikethrough}
+            title="Strikethrough"
+          />
+        )}
+        {enableInlineCode && (
+          <ToolbarButton
+            onClick={() => editor.chain().focus().toggleCode().run()}
+            active={editor.isActive('code')}
+            icon={Code}
+            title="Inline Code"
+          />
+        )}
+        {enableCodeBlocks && (
+          <ToolbarButton
+            onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+            active={editor.isActive('codeBlock')}
+            icon={FileCode}
+            title="Code Block"
+          />
+        )}
+        {enableLinks && (
+          <ToolbarButton
+            onClick={setLink}
+            active={editor.isActive('link')}
+            icon={LinkIcon}
+            title="Add Link"
+          />
+        )}
+        {enableImages && (
+          <ToolbarButton
+            onClick={addImage}
+            active={editor.isActive('image')}
+            icon={ImageIcon}
+            title="Add Image"
+          />
+        )}
 
-        <Separator orientation="vertical" className="h-6" />
+        {enableHeadings && (
+          <>
+            <Separator orientation="vertical" className="h-6" />
 
-        <ToolbarButton
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 1 }).run()
-          }
-          active={editor.isActive('heading', { level: 1 })}
-          icon={Heading1}
-          title="Heading 1"
-        />
-        <ToolbarButton
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 2 }).run()
-          }
-          active={editor.isActive('heading', { level: 2 })}
-          icon={Heading2}
-          title="Heading 2"
-        />
-        <ToolbarButton
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 3 }).run()
-          }
-          active={editor.isActive('heading', { level: 3 })}
-          icon={Heading3}
-          title="Heading 3"
-        />
+            <ToolbarButton
+              onClick={() =>
+                editor.chain().focus().toggleHeading({ level: 1 }).run()
+              }
+              active={editor.isActive('heading', { level: 1 })}
+              icon={Heading1}
+              title="Heading 1"
+            />
+            <ToolbarButton
+              onClick={() =>
+                editor.chain().focus().toggleHeading({ level: 2 }).run()
+              }
+              active={editor.isActive('heading', { level: 2 })}
+              icon={Heading2}
+              title="Heading 2"
+            />
+            <ToolbarButton
+              onClick={() =>
+                editor.chain().focus().toggleHeading({ level: 3 }).run()
+              }
+              active={editor.isActive('heading', { level: 3 })}
+              icon={Heading3}
+              title="Heading 3"
+            />
+          </>
+        )}
 
-        <Separator orientation="vertical" className="h-6" />
+        {(enableLists || enableBlockquote) && (
+          <>
+            <Separator orientation="vertical" className="h-6" />
 
-        <ToolbarButton
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
-          active={editor.isActive('bulletList')}
-          icon={List}
-          title="Bullet List"
-        />
-        <ToolbarButton
-          onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          active={editor.isActive('orderedList')}
-          icon={ListOrdered}
-          title="Ordered List"
-        />
-        <ToolbarButton
-          onClick={() => editor.chain().focus().toggleBlockquote().run()}
-          active={editor.isActive('blockquote')}
-          icon={Quote}
-          title="Blockquote"
-        />
+            {enableLists && (
+              <>
+                <ToolbarButton
+                  onClick={() =>
+                    editor.chain().focus().toggleBulletList().run()
+                  }
+                  active={editor.isActive('bulletList')}
+                  icon={List}
+                  title="Bullet List"
+                />
+                <ToolbarButton
+                  onClick={() =>
+                    editor.chain().focus().toggleOrderedList().run()
+                  }
+                  active={editor.isActive('orderedList')}
+                  icon={ListOrdered}
+                  title="Ordered List"
+                />
+              </>
+            )}
+            {enableBlockquote && (
+              <ToolbarButton
+                onClick={() => editor.chain().focus().toggleBlockquote().run()}
+                active={editor.isActive('blockquote')}
+                icon={Quote}
+                title="Blockquote"
+              />
+            )}
+          </>
+        )}
 
         <Separator orientation="vertical" className="h-6" />
 

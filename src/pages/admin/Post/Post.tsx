@@ -246,7 +246,7 @@ function PostPage() {
                     <Checkbox
                       className="w-4!"
                       checked={field.value}
-                      onCheckedChange={(checked) =>
+                      onCheckedChange={(checked: boolean) =>
                         field.onChange(checked === true)
                       }
                     />
