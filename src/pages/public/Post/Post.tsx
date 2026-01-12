@@ -280,7 +280,7 @@ function Post() {
           </CardContent>
         </Card>
         <div
-          className="prose max-w-none"
+          className="ProseMirror"
           dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }}
         />
         <Separator className="my-8" />
