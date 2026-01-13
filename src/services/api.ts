@@ -30,9 +30,20 @@ export class ApiClient {
 
     if (!response.ok) {
       const errorBody = await response.json().catch(() => null)
-      const errorMessage =
-        errorBody?.detail ||
-        'Sorry, something went wrong. Please try again later.'
+
+      let errorMessage = 'Sorry, something went wrong. Please try again later.'
+
+      // Handle FastAPI validation errors (422)
+      if (Array.isArray(errorBody?.detail)) {
+        errorMessage = errorBody.detail
+          .map((err: { msg?: string; loc?: string[] }) => {
+            const field = err.loc?.[err.loc.length - 1] || 'Field'
+            return `${field}: ${err.msg || 'Invalid value'}`
+          })
+          .join(', ')
+      } else if (typeof errorBody?.detail === 'string') {
+        errorMessage = errorBody.detail
+      }
 
       toast.error(errorMessage)
 
