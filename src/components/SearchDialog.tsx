@@ -30,14 +30,14 @@ import { apiClient } from '@/services/api'
 import type { SearchResponse } from '@/types/search'
 import { Post, Tag } from '@/types'
 
-interface SearchModalProps {
+interface SearchDialogProps {
   isOpen: boolean
   onClose: () => void
 }
 
 const POSTS_LIMIT = 10
 
-function SearchModal({ isOpen, onClose }: SearchModalProps) {
+function SearchDialog({ isOpen, onClose }: SearchDialogProps) {
   const [query, setQuery] = useState('')
   const [isSearching, setIsSearching] = useState(false)
   const [posts, setPosts] = useState<Post[]>([])
@@ -246,4 +246,4 @@ function SearchModal({ isOpen, onClose }: SearchModalProps) {
   )
 }
 
-export default SearchModal
+export default SearchDialog

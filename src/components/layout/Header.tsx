@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/tooltip'
 import { useTheme } from '@/contexts/theme'
 import Logo from '@/components/Logo'
-import SearchModal from '@/components/SearchModal'
+import SearchDialog from '@/components/SearchDialog'
 
 function Header() {
   const { theme, toggleTheme } = useTheme()
@@ -160,7 +160,7 @@ function Header() {
         </div>
       </div>
 
-      <SearchModal
+      <SearchDialog
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
       />
