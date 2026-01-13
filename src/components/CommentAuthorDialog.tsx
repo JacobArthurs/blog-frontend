@@ -18,6 +18,7 @@ const STORAGE_KEY_EMAIL = 'comment_author_email'
 
 interface CommentAuthorDialogProps {
   open: boolean
+  isReply: boolean
   onOpenChange: (open: boolean) => void
   onConfirm: (name: string, email: string) => void
   isSubmitting?: boolean
@@ -25,6 +26,7 @@ interface CommentAuthorDialogProps {
 
 export function CommentAuthorDialog({
   open,
+  isReply,
   onOpenChange,
   onConfirm,
   isSubmitting = false
@@ -162,8 +164,10 @@ export function CommentAuthorDialog({
                 Submitting...
                 <Spinner />
               </>
+            ) : isReply ? (
+              'Reply'
             ) : (
-              'Submit Comment'
+              'Comment'
             )}
           </Button>
         </DialogFooter>

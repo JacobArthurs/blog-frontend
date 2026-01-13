@@ -5,6 +5,7 @@ import { Spinner } from './ui/spinner'
 import { apiClient } from '@/services'
 import { CommentCreate } from '@/types'
 import { CommentAuthorDialog } from '@/components/CommentAuthorDialog'
+import { toast } from 'sonner'
 
 interface CreateCommentProps {
   postId: number
@@ -49,6 +50,7 @@ export function CreateComment({
         author_email: email
       }
       await apiClient.post<Comment>(`/comments`, createData)
+      toast.success(`${isReply ? 'Reply' : 'Comment'} submitted successfully`)
       setContent('')
       setIsDialogOpen(false)
       await onSubmit?.()
@@ -104,6 +106,7 @@ export function CreateComment({
 
       <CommentAuthorDialog
         open={isDialogOpen}
+        isReply={isReply}
         onOpenChange={setIsDialogOpen}
         onConfirm={handleDialogConfirm}
         isSubmitting={isSubmitting}
