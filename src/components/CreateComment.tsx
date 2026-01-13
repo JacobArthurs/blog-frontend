@@ -60,14 +60,13 @@ export function CreateComment({
   }
 
   return (
-    <div className="space-y-2">
+    <div className="flex flex-col gap-4">
       <RichTextEditor
         content={content}
         onChange={setContent}
         placeholder={isReply ? 'Write a reply...' : 'Write a comment...'}
         config={{
-          enableImages: false,
-          enableLinks: false
+          enableImages: false
         }}
       />
       <div className="flex gap-2 justify-end">

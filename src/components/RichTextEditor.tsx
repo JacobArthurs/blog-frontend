@@ -42,6 +42,7 @@ import {
   TooltipContent,
   TooltipTrigger
 } from '@/components/ui/tooltip'
+import { LinkDialog } from '@/components/LinkDialog'
 
 const lowlight = createLowlight(common)
 
@@ -89,6 +90,9 @@ export function RichTextEditor({
   const [imageUrl, setImageUrl] = useState('')
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [isUploading, setIsUploading] = useState(false)
+  const [linkDialogOpen, setLinkDialogOpen] = useState(false)
+  const [initialLinkUrl, setInitialLinkUrl] = useState('')
+  const [initialLinkText, setInitialLinkText] = useState('')
 
   const editor = useEditor({
     extensions: [
@@ -145,20 +149,56 @@ export function RichTextEditor({
     return null
   }
 
-  const setLink = () => {
-    const previousUrl = editor.getAttributes('link').href
-    const url = window.prompt('Enter URL:', previousUrl)
+  const openLinkDialog = () => {
+    const { from, to } = editor.state.selection
+    const selectedText = editor.state.doc.textBetween(from, to, '')
+    const previousUrl = editor.getAttributes('link').href || ''
 
-    if (url === null) {
-      return
+    setInitialLinkUrl(previousUrl)
+    setInitialLinkText(selectedText)
+    setLinkDialogOpen(true)
+  }
+
+  const handleLinkConfirm = (url: string, text: string) => {
+    let normalizedUrl = url.trim()
+    if (!normalizedUrl.match(/^[a-zA-Z][a-zA-Z\d+\-.]*:/)) {
+      normalizedUrl = 'http://' + normalizedUrl
     }
 
-    if (url === '') {
-      editor.chain().focus().extendMarkRange('link').unsetLink().run()
-      return
-    }
+    const { from, to } = editor.state.selection
+    const hasSelection = from !== to
+    const isInsideLink = editor.isActive('link')
 
-    editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run()
+    if (hasSelection || isInsideLink) {
+      if (isInsideLink && !hasSelection) {
+        editor
+          .chain()
+          .focus()
+          .extendMarkRange('link')
+          .setLink({ href: normalizedUrl })
+          .run()
+      } else {
+        editor.chain().focus().setLink({ href: normalizedUrl }).run()
+      }
+    } else {
+      const textToInsert = text || url
+      editor
+        .chain()
+        .focus()
+        .insertContent({
+          type: 'text',
+          text: textToInsert,
+          marks: [
+            {
+              type: 'link',
+              attrs: {
+                href: normalizedUrl
+              }
+            }
+          ]
+        })
+        .run()
+    }
   }
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -250,7 +290,7 @@ export function RichTextEditor({
   return (
     <div className="border rounded-lg overflow-hidden bg-background">
       {/* Toolbar */}
-      <div className="border-b bg-muted p-2 flex flex-wrap gap-1">
+      <div className="p-2 flex flex-wrap items-center gap-1">
         {enableBold && (
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleBold().run()}
@@ -293,7 +333,7 @@ export function RichTextEditor({
         )}
         {enableLinks && (
           <ToolbarButton
-            onClick={setLink}
+            onClick={openLinkDialog}
             active={editor.isActive('link')}
             icon={LinkIcon}
             title="Add Link"
@@ -310,7 +350,7 @@ export function RichTextEditor({
 
         {enableHeadings && (
           <>
-            <Separator orientation="vertical" className="h-6" />
+            <Separator orientation="vertical" className="h-6!" />
 
             <ToolbarButton
               onClick={() =>
@@ -341,7 +381,7 @@ export function RichTextEditor({
 
         {(enableLists || enableBlockquote) && (
           <>
-            <Separator orientation="vertical" className="h-6" />
+            <Separator orientation="vertical" className="h-6!" />
 
             {enableLists && (
               <>
@@ -374,7 +414,7 @@ export function RichTextEditor({
           </>
         )}
 
-        <Separator orientation="vertical" className="h-6" />
+        <Separator orientation="vertical" className="h-6!" />
 
         <ToolbarButton
           onClick={() => editor.chain().focus().undo().run()}
@@ -407,8 +447,8 @@ export function RichTextEditor({
               <TabsTrigger value="url">URL</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="upload" className="space-y-4">
-              <div className="space-y-2">
+            <TabsContent value="upload" className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="file">Select Image</Label>
                 <Input
                   id="file"
@@ -425,8 +465,8 @@ export function RichTextEditor({
               </div>
             </TabsContent>
 
-            <TabsContent value="url" className="space-y-4">
-              <div className="space-y-2">
+            <TabsContent value="url" className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="url">Image URL</Label>
                 <Input
                   id="url"
@@ -464,6 +504,15 @@ export function RichTextEditor({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Link Dialog */}
+      <LinkDialog
+        open={linkDialogOpen}
+        onOpenChange={setLinkDialogOpen}
+        initialUrl={initialLinkUrl}
+        initialText={initialLinkText}
+        onConfirm={handleLinkConfirm}
+      />
     </div>
   )
 }
