@@ -47,7 +47,7 @@ const formSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   slug: z.string().optional(),
   featured: z.boolean(),
-  view_count: z.number().optional(),
+  view_count: z.coerce.number(),
   tag_ids: z.array(z.number()).optional(),
   summary: z.string().min(1, 'Summary is required'),
   content: z.string().min(1, 'Content is required')
@@ -244,7 +244,7 @@ function PostPage() {
                       Featured
                     </FieldLabel>
                     <Checkbox
-                      className="w-4!"
+                      className="w-4! cursor-pointer"
                       checked={field.value}
                       onCheckedChange={(checked: boolean) =>
                         field.onChange(checked === true)
@@ -406,13 +406,19 @@ function PostPage() {
           <Field orientation="horizontal">
             <Button
               type="button"
+              className="cursor-pointer"
               variant="outline"
               onClick={() => navigate('/admin')}
               disabled={isLoading}
             >
               Cancel
             </Button>
-            <Button type="submit" form="form-post" disabled={isLoading}>
+            <Button
+              type="submit"
+              className="cursor-pointer"
+              form="form-post"
+              disabled={isLoading}
+            >
               {isLoading ? 'Saving...' : isEditing ? 'Update' : 'Create'}
             </Button>
           </Field>
@@ -442,8 +448,7 @@ function PostPage() {
                   >
                     <div className="flex flex-col gap-1 flex-1">
                       <div>
-                        <strong>{comment.author_name}</strong> (
-                        {comment.author_email})
+                        <strong>{comment.author_name}</strong>
                       </div>
                       <div className="text-muted-foreground text-xs">
                         {new Date(comment.created_at).toLocaleString()} •{' '}
