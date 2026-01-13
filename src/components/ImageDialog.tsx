@@ -63,13 +63,17 @@ export function ImageDialog({
           <DialogTitle>Add Image</DialogTitle>
         </DialogHeader>
 
-        <Tabs defaultValue="upload" className="w-full">
+        <Tabs defaultValue="upload" className="w-full mt-4">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="upload">Upload</TabsTrigger>
-            <TabsTrigger value="url">URL</TabsTrigger>
+            <TabsTrigger value="upload" className="cursor-pointer">
+              Upload
+            </TabsTrigger>
+            <TabsTrigger value="url" className="cursor-pointer">
+              URL
+            </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="upload" className="flex flex-col gap-4">
+          <TabsContent value="upload" className="flex flex-col gap-4 mt-8">
             <div className="flex flex-col gap-2">
               <Label htmlFor="file">Select Image</Label>
               <Input
@@ -87,7 +91,7 @@ export function ImageDialog({
             </div>
           </TabsContent>
 
-          <TabsContent value="url" className="flex flex-col gap-4">
+          <TabsContent value="url" className="flex flex-col gap-4 mt-8">
             <div className="flex flex-col gap-2">
               <Label htmlFor="url">Image URL</Label>
               <Input

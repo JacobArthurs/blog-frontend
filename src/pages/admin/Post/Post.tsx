@@ -433,14 +433,14 @@ function PostPage() {
                 No comments for this post.
               </p>
             ) : (
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 {flatComments.map((comment) => (
                   <div
                     key={comment.id}
                     className="border-2 p-3 text-sm flex justify-between items-start gap-2"
                     style={{ marginLeft: `${comment.displayDepth * 2}rem` }}
                   >
-                    <div className="space-y-1 flex-1">
+                    <div className="flex flex-col gap-1 flex-1">
                       <div>
                         <strong>{comment.author_name}</strong> (
                         {comment.author_email})
@@ -455,7 +455,7 @@ function PostPage() {
                       type="button"
                       variant="ghost"
                       size="sm"
-                      className="h-8 w-8 p-0"
+                      className="h-8 w-8 p-0 cursor-pointer"
                       onClick={() => handleDeleteComment(comment.id)}
                     >
                       <X className="h-4 w-4" />
