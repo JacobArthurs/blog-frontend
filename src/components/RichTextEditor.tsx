@@ -1,9 +1,10 @@
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import CodeBlock from '@tiptap/extension-code-block'
+import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
 import Link from '@tiptap/extension-link'
 import Image from '@tiptap/extension-image'
 import Placeholder from '@tiptap/extension-placeholder'
+import { common, createLowlight } from 'lowlight'
 import {
   Bold,
   Italic,
@@ -41,6 +42,8 @@ import {
   TooltipContent,
   TooltipTrigger
 } from '@/components/ui/tooltip'
+
+const lowlight = createLowlight(common)
 
 interface RichTextEditorConfig {
   enableImages?: boolean
@@ -100,10 +103,16 @@ export function RichTextEditor({
         strike: enableStrike ? undefined : false,
         code: enableInlineCode ? undefined : false
       }),
+      ...(enableCodeBlocks
+        ? [
+            CodeBlockLowlight.configure({
+              lowlight
+            })
+          ]
+        : []),
       Placeholder.configure({
         placeholder: placeholder || 'Write something...'
       }),
-      ...(enableCodeBlocks ? [CodeBlock] : []),
       ...(enableLinks
         ? [
             Link.configure({

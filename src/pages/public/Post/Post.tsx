@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import DOMPurify from 'dompurify'
 import { apiClient } from '@/services/api'
+import { highlightCodeBlocks } from '@/utils/highlightCode'
 import type {
   Post as PostType,
   Comment as CommentType,
@@ -280,7 +281,9 @@ function Post() {
         </Card>
         <div
           className="ProseMirror"
-          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }}
+          dangerouslySetInnerHTML={{
+            __html: DOMPurify.sanitize(highlightCodeBlocks(post.content))
+          }}
         />
         <Separator className="my-8" />
         <div className="flex items-center gap-2">

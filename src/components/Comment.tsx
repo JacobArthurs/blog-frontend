@@ -2,6 +2,8 @@ import { Comment as CommentType } from '@/types/comments'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import DOMPurify from 'dompurify'
+import { highlightCodeBlocks } from '@/utils/highlightCode'
+import { useState } from 'react'
 import {
   Tooltip,
   TooltipTrigger,
@@ -17,7 +19,6 @@ import { TimeAgo } from '@/components/TimeAgo'
 import CryptoJS from 'crypto-js'
 import { ChevronDown, ThumbsDown, ThumbsUp } from 'lucide-react'
 import { apiClient } from '@/services/api'
-import { useState } from 'react'
 import { CreateComment } from '@/components/CreateComment'
 import { toast } from 'sonner'
 
@@ -111,7 +112,7 @@ export function Comment({ comment, onRefresh }: CommentProps) {
           <div
             className="ProseMirror-comment mb-2"
             dangerouslySetInnerHTML={{
-              __html: DOMPurify.sanitize(comment.content)
+              __html: DOMPurify.sanitize(highlightCodeBlocks(comment.content))
             }}
           />
 
