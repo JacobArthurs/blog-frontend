@@ -24,16 +24,6 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useState, useEffect } from 'react'
 import type { UploadResponse } from '@/types/uploads'
 import { toast } from 'sonner'
@@ -43,6 +33,7 @@ import {
   TooltipTrigger
 } from '@/components/ui/tooltip'
 import { LinkDialog } from '@/components/LinkDialog'
+import { ImageDialog } from '@/components/ImageDialog'
 
 const lowlight = createLowlight(common)
 
@@ -87,8 +78,6 @@ export function RichTextEditor({
     enableStrike = true
   } = config
   const [imageDialogOpen, setImageDialogOpen] = useState(false)
-  const [imageUrl, setImageUrl] = useState('')
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [isUploading, setIsUploading] = useState(false)
   const [linkDialogOpen, setLinkDialogOpen] = useState(false)
   const [initialLinkUrl, setInitialLinkUrl] = useState('')
@@ -201,23 +190,15 @@ export function RichTextEditor({
     }
   }
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      setSelectedFile(file)
-      setImageUrl('')
-    }
-  }
-
-  const handleUploadImage = async () => {
+  const handleImageConfirm = async (urlOrFile: string | File) => {
     try {
       setIsUploading(true)
 
-      let finalUrl = imageUrl
+      let finalUrl: string
 
-      if (selectedFile) {
+      if (urlOrFile instanceof File) {
         const formData = new FormData()
-        formData.append('file', selectedFile)
+        formData.append('file', urlOrFile)
 
         const token = sessionStorage.getItem('access_token')
         const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
@@ -237,15 +218,13 @@ export function RichTextEditor({
 
         const data: UploadResponse = await response.json()
         finalUrl = `${apiBaseUrl}${data.url}`
+      } else {
+        finalUrl = urlOrFile
       }
 
-      if (finalUrl) {
-        editor.chain().focus().setImage({ src: finalUrl }).run()
-        setImageDialogOpen(false)
-        setImageUrl('')
-        setSelectedFile(null)
-        toast.success('Image added successfully')
-      }
+      editor.chain().focus().setImage({ src: finalUrl }).run()
+      setImageDialogOpen(false)
+      toast.success('Image added successfully')
     } catch (error) {
       const message =
         error instanceof Error ? error.message : 'Failed to upload image'
@@ -434,76 +413,13 @@ export function RichTextEditor({
         className="prose prose-sm dark:prose-invert max-w-none"
       />
 
-      {/* Image Upload Dialog */}
-      <Dialog open={imageDialogOpen} onOpenChange={setImageDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add Image</DialogTitle>
-          </DialogHeader>
-
-          <Tabs defaultValue="upload" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="upload">Upload</TabsTrigger>
-              <TabsTrigger value="url">URL</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="upload" className="flex flex-col gap-4">
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="file">Select Image</Label>
-                <Input
-                  id="file"
-                  type="file"
-                  accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
-                  onChange={handleFileSelect}
-                  disabled={isUploading}
-                />
-                {selectedFile && (
-                  <p className="text-sm text-muted-foreground">
-                    Selected: {selectedFile.name}
-                  </p>
-                )}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="url" className="flex flex-col gap-4">
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="url">Image URL</Label>
-                <Input
-                  id="url"
-                  type="url"
-                  placeholder="https://example.com/image.jpg"
-                  value={imageUrl}
-                  onChange={(e) => {
-                    setImageUrl(e.target.value)
-                    setSelectedFile(null)
-                  }}
-                  disabled={isUploading}
-                />
-              </div>
-            </TabsContent>
-          </Tabs>
-
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setImageDialogOpen(false)
-                setImageUrl('')
-                setSelectedFile(null)
-              }}
-              disabled={isUploading}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleUploadImage}
-              disabled={isUploading || (!selectedFile && !imageUrl)}
-            >
-              {isUploading ? 'Adding...' : 'Add Image'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Image Dialog */}
+      <ImageDialog
+        open={imageDialogOpen}
+        onOpenChange={setImageDialogOpen}
+        onConfirm={handleImageConfirm}
+        isUploading={isUploading}
+      />
 
       {/* Link Dialog */}
       <LinkDialog
