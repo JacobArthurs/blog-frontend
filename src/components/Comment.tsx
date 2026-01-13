@@ -91,7 +91,7 @@ export function Comment({ comment, onRefresh }: CommentProps) {
         <Avatar className="h-10 w-10">
           <AvatarImage
             src={`https://www.gravatar.com/avatar/${CryptoJS.MD5(
-              comment.author_email.trim().toLowerCase()
+              comment.author_name.trim().toLowerCase()
             )}?s=200&d=retro&r=g`}
             alt={comment.author_name}
           />
