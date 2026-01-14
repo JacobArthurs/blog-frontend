@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { apiClient } from '@/services/api'
-import type { PaginatedResponse, Post, Tag } from '@/types'
+import type { PaginatedResponse, Post, Tag as TagType } from '@/types'
 import { PostCard } from '@/components/PostCard'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
@@ -10,7 +10,7 @@ import { Tag as TagIcon } from 'lucide-react'
 function Tag() {
   const { slug } = useParams()
   const navigate = useNavigate()
-  const [tag, setTag] = useState<Tag | null>(null)
+  const [tag, setTag] = useState<TagType | null>(null)
   const [posts, setPosts] = useState<Post[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false)
@@ -34,7 +34,7 @@ function Tag() {
 
       try {
         const [tagData, postsData] = await Promise.all([
-          apiClient.get<Tag>(`/tags/slug/${slug}`),
+          apiClient.get<TagType>(`/tags/slug/${slug}`),
           apiClient.get<PaginatedResponse<Post>>(
             `/posts/tag/${slug}?offset=0&limit=${POSTS_PER_PAGE}`
           )

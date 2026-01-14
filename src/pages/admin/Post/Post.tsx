@@ -47,7 +47,7 @@ const formSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   slug: z.string().optional(),
   featured: z.boolean(),
-  view_count: z.coerce.number(),
+  view_count: z.number(),
   tag_ids: z.array(z.number()).optional(),
   summary: z.string().min(1, 'Summary is required'),
   content: z.string().min(1, 'Content is required')
@@ -355,6 +355,8 @@ function PostPage() {
                         type="number"
                         autoComplete="off"
                         disabled={isLoading}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        value={field.value}
                       />
                       {fieldState.invalid && (
                         <FieldError errors={[fieldState.error]} />
