@@ -1,4 +1,7 @@
-import { useState, useEffect } from 'react'
+import * as z from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Controller, useForm } from 'react-hook-form'
+import { useEffect } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -8,8 +11,53 @@ import {
   DialogDescription
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel
+} from '@/components/ui/field'
+
+const urlValidation = z
+  .string()
+  .min(1, 'URL is required')
+  .trim()
+  .refine(
+    (url) => {
+      let urlToValidate = url
+
+      if (!urlToValidate.match(/^[a-zA-Z][a-zA-Z\d+\-.]*:/)) {
+        urlToValidate = 'http://' + urlToValidate
+      }
+
+      try {
+        const urlObj = new URL(urlToValidate)
+
+        if (!urlObj.hostname || !urlObj.hostname.includes('.')) {
+          return false
+        }
+
+        if (urlObj.hostname.endsWith('.')) {
+          return false
+        }
+
+        const domainPattern =
+          /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
+        return domainPattern.test(urlObj.hostname)
+      } catch {
+        return false
+      }
+    },
+    { message: 'Please enter a valid URL' }
+  )
+
+const formSchema = z.object({
+  url: urlValidation,
+  text: z.string().trim()
+})
+
+type FormValues = z.infer<typeof formSchema>
 
 interface LinkDialogProps {
   open: boolean
@@ -26,64 +74,26 @@ export function LinkDialog({
   initialText = '',
   onConfirm
 }: LinkDialogProps) {
-  const [linkUrl, setLinkUrl] = useState(initialUrl)
-  const [linkText, setLinkText] = useState(initialText)
-  const [linkUrlError, setLinkUrlError] = useState('')
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      url: '',
+      text: ''
+    }
+  })
 
   useEffect(() => {
     if (open) {
-      setLinkUrl(initialUrl)
-      setLinkText(initialText)
-      setLinkUrlError('')
+      form.reset({
+        url: initialUrl,
+        text: initialText
+      })
     }
-  }, [open, initialUrl, initialText])
+  }, [open, initialUrl, initialText, form])
 
-  const validateUrl = (url: string): boolean => {
-    if (!url) {
-      setLinkUrlError('URL is required')
-      return false
-    }
-
-    let urlToValidate = url.trim()
-
-    if (!urlToValidate.match(/^[a-zA-Z][a-zA-Z\d+\-.]*:/)) {
-      urlToValidate = 'http://' + urlToValidate
-    }
-
-    try {
-      const urlObj = new URL(urlToValidate)
-
-      if (!urlObj.hostname || !urlObj.hostname.includes('.')) {
-        setLinkUrlError('Please enter a valid URL')
-        return false
-      }
-
-      if (urlObj.hostname.endsWith('.')) {
-        setLinkUrlError('Please enter a valid URL')
-        return false
-      }
-
-      const domainPattern =
-        /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
-      if (!domainPattern.test(urlObj.hostname)) {
-        setLinkUrlError('Please enter a valid URL')
-        return false
-      }
-
-      setLinkUrlError('')
-      return true
-    } catch {
-      setLinkUrlError('Please enter a valid URL')
-      return false
-    }
-  }
-
-  const handleConfirm = () => {
-    if (!validateUrl(linkUrl)) {
-      return
-    }
-    onConfirm(linkUrl, linkText)
-    handleClose()
+  const onSubmit = (data: FormValues) => {
+    onConfirm(data.url, data.text)
+    onOpenChange(false)
   }
 
   const handleClose = () => {
@@ -100,38 +110,58 @@ export function LinkDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col gap-8">
-          <h3>Add Link</h3>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="link-text">Text</Label>
-            <Input
-              id="link-text"
-              type="text"
-              placeholder="Text to display"
-              value={linkText}
-              onChange={(e) => setLinkText(e.target.value)}
-            />
-          </div>
+        <form
+          id="form-link"
+          onSubmit={(e) => {
+            e.stopPropagation()
+            form.handleSubmit(onSubmit)(e)
+          }}
+        >
+          <div className="flex flex-col gap-8">
+            <h3>Add Link</h3>
+            <FieldGroup>
+              <Controller
+                name="text"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="link-text">Text</FieldLabel>
+                    <Input
+                      {...field}
+                      id="link-text"
+                      type="text"
+                      placeholder="Text to display"
+                      autoComplete="off"
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
 
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="link-url">Link</Label>
-            <Input
-              id="link-url"
-              type="url"
-              placeholder="https://example.com"
-              value={linkUrl}
-              onChange={(e) => {
-                setLinkUrl(e.target.value)
-                if (linkUrlError) {
-                  setLinkUrlError('')
-                }
-              }}
-            />
-            {linkUrlError && (
-              <p className="text-sm text-destructive">{linkUrlError}</p>
-            )}
+              <Controller
+                name="url"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="link-url">Link</FieldLabel>
+                    <Input
+                      {...field}
+                      id="link-url"
+                      type="text"
+                      placeholder="https://example.com"
+                      autoComplete="off"
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+            </FieldGroup>
           </div>
-        </div>
+        </form>
 
         <DialogFooter>
           <Button
@@ -141,11 +171,7 @@ export function LinkDialog({
           >
             Cancel
           </Button>
-          <Button
-            className="cursor-pointer"
-            onClick={handleConfirm}
-            disabled={!linkUrl}
-          >
+          <Button type="submit" form="form-link" className="cursor-pointer">
             Add Link
           </Button>
         </DialogFooter>

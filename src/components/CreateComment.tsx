@@ -39,15 +39,14 @@ export function CreateComment({
     setIsDialogOpen(true)
   }
 
-  const handleDialogConfirm = async (name: string, email: string) => {
+  const handleDialogConfirm = async (name: string) => {
     setIsSubmitting(true)
     try {
       const createData: CommentCreate = {
         post_id: postId,
         parent_id: parentId,
         content,
-        author_name: name,
-        author_email: email
+        author_name: name
       }
       await apiClient.post<Comment>(`/comments`, createData)
       toast.success(`${isReply ? 'Reply' : 'Comment'} submitted successfully`)
