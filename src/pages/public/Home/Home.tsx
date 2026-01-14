@@ -91,7 +91,7 @@ function Home() {
         <div className="flex flex-col gap-8 my-16">
           <div className="flex items-center gap-2">
             <Flame size={28} />
-            <p className="text-lg font-bold">Featured Blog Post</p>
+            <p className="text-lg font-bold">Featured Post</p>
           </div>
           <Card>
             <CardContent className="flex flex-col gap-4">
@@ -116,7 +116,7 @@ function Home() {
         </div>
         <div className="flex items-center gap-2">
           <History size={28} />
-          <p className="text-lg font-bold">Recent Blog Posts</p>
+          <p className="text-lg font-bold">Recent Posts</p>
         </div>
         <div className="grid md:grid-cols-2 gap-8">
           {[...Array(4)].map((_, i) => (
@@ -151,14 +151,14 @@ function Home() {
         <div className="flex flex-col gap-8 my-16">
           <div className="flex items-center gap-2">
             <Flame size={28} />
-            <p className="text-lg font-bold">Featured Blog Post</p>
+            <p className="text-lg font-bold">Featured Post</p>
           </div>
           <PostCard post={featuredPost} isFeatured={true} />
         </div>
       )}
       <div className="flex items-center gap-2">
         <History size={28} />
-        <p className="text-lg font-bold">Recent Blog Posts</p>
+        <p className="text-lg font-bold">Recent Posts</p>
       </div>
       <div className="grid md:grid-cols-2 gap-8 auto-rows-fr">
         {posts.map((post) => (

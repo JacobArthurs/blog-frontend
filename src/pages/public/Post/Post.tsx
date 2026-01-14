@@ -304,16 +304,16 @@ function Post() {
                 <Skeleton key={i} className="w-1/2 h-20" />
               ))}
             </>
-          ) : post.comment_count === 0 ? (
+          ) : comments.length === 0 ? (
             <Empty>
               <EmptyHeader>
                 <EmptyMedia variant="icon">
                   <MessageCircleX />
                 </EmptyMedia>
-                <EmptyTitle>No Comments Yet</EmptyTitle>
+                <EmptyTitle>Be the first to comment</EmptyTitle>
                 <EmptyDescription>
-                  No comments have been added to this blog post yet. Be the
-                  first to share your thoughts!
+                  Nobody&apos;s responded to this post yet. Add your thoughts
+                  and get the conversation going.
                 </EmptyDescription>
               </EmptyHeader>
             </Empty>

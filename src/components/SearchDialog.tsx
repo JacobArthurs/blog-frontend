@@ -137,17 +137,15 @@ function SearchDialog({ isOpen, onClose }: SearchDialogProps) {
         className="max-h-[80vh] flex flex-col"
       >
         <DialogHeader>
-          <DialogTitle className="sr-only">
-            Search blog posts and tags
-          </DialogTitle>
+          <DialogTitle className="sr-only">Search posts and tags</DialogTitle>
           <DialogDescription className="sr-only">
-            Search through blog posts and tags
+            Search through posts and tags
           </DialogDescription>
         </DialogHeader>
 
         <Input
           startIcon={Search}
-          placeholder="Search blog posts and tags..."
+          placeholder="Search posts and tags..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           autoFocus
@@ -160,9 +158,9 @@ function SearchDialog({ isOpen, onClose }: SearchDialogProps) {
               <EmptyMedia variant="icon">
                 <FolderSearch2 />
               </EmptyMedia>
-              <EmptyTitle>Search Blog Posts and Tags</EmptyTitle>
+              <EmptyTitle>Search posts and Tags</EmptyTitle>
               <EmptyDescription>
-                Start typing to find blog posts and tags that interest you.
+                Start typing to find posts and tags that interest you.
               </EmptyDescription>
             </EmptyHeader>
           </Empty>
@@ -176,8 +174,8 @@ function SearchDialog({ isOpen, onClose }: SearchDialogProps) {
               </EmptyMedia>
               <EmptyTitle>No Results Found</EmptyTitle>
               <EmptyDescription>
-                No blog posts or tags match your search. Try different keywords
-                or check your spelling.
+                No posts or tags match your search. Try different keywords or
+                check your spelling.
               </EmptyDescription>
             </EmptyHeader>
           </Empty>
@@ -209,7 +207,7 @@ function SearchDialog({ isOpen, onClose }: SearchDialogProps) {
               <div className="mt-4">
                 <div className="flex items-center gap-2">
                   <FileText size={28} />
-                  <p className="text-lg font-bold">Blog Posts</p>
+                  <p className="text-lg font-bold">posts</p>
                 </div>
                 <div className="mt-4">
                   {posts.map((post) => (
@@ -232,7 +230,7 @@ function SearchDialog({ isOpen, onClose }: SearchDialogProps) {
                       disabled={isLoadingPosts}
                       variant="outline"
                     >
-                      {isLoadingPosts ? 'Loading...' : 'Show more blog posts'}
+                      {isLoadingPosts ? 'Loading...' : 'Show more posts'}
                       {isLoadingPosts ? <Spinner /> : <ArrowDown />}
                     </Button>
                   </div>
