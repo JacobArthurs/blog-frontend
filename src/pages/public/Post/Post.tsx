@@ -15,7 +15,7 @@ import {
   Eye,
   Hash,
   MessageCircle,
-  MessageCircleX,
+  MessageCirclePlus,
   Sparkles
 } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -307,8 +307,8 @@ function Post() {
           ) : comments.length === 0 ? (
             <Empty>
               <EmptyHeader>
-                <EmptyMedia variant="icon">
-                  <MessageCircleX />
+                <EmptyMedia variant="icon" className="size-20!">
+                  <MessageCirclePlus className="size-12!" />
                 </EmptyMedia>
                 <EmptyTitle>Be the first to comment</EmptyTitle>
                 <EmptyDescription>
