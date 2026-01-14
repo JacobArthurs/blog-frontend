@@ -19,6 +19,7 @@ import {
   FieldLabel
 } from '@/components/ui/field'
 import { authService } from '@/services'
+import { toast } from 'sonner'
 
 const formSchema = z.object({
   username: z.string().min(1, 'Username is required'),
@@ -38,6 +39,7 @@ function Login() {
   async function onSubmit(data: z.infer<typeof formSchema>) {
     try {
       await authService.login(data)
+      toast.success('Credentials validated, logging in...')
       navigate('/admin')
     } catch (error) {
       console.error('Login failed:', error)
