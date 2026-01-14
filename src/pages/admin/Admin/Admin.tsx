@@ -125,12 +125,14 @@ function Admin() {
 
   return (
     <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-4">
+        <h2 className="text-2xl font-bold">Tags</h2>
+        <Button onClick={() => navigate('/admin/tag')} className="w-fit">
+          New Tag
+        </Button>
+      </div>
       {tags.length > 0 && (
         <div className="flex flex-col gap-4">
-          <h2 className="text-2xl font-bold">Tags</h2>
-          <Button onClick={() => navigate('/admin/tag')} className="w-fit">
-            New Tag
-          </Button>
           <Table>
             <TableHeader>
               <TableRow>
@@ -166,12 +168,14 @@ function Admin() {
         </div>
       )}
 
+      <div className="flex flex-col gap-4">
+        <h2 className="text-2xl font-bold">Posts</h2>
+        <Button onClick={() => navigate('/admin/post')} className="w-fit">
+          New Post
+        </Button>
+      </div>
       {posts.length > 0 && (
         <div className="flex flex-col gap-4">
-          <h2 className="text-2xl font-bold">Posts</h2>
-          <Button onClick={() => navigate('/admin/post')} className="w-fit">
-            New Post
-          </Button>
           <Table>
             <TableHeader>
               <TableRow>
