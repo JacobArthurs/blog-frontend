@@ -79,7 +79,7 @@ function TagPage() {
           name: data.name,
           slug: data.slug || undefined
         }
-        await apiClient.post('/tags', createData)
+        await apiClient.post('/tags/', createData)
       }
       toast.success('Tag saved successfully')
       navigate('/admin')
