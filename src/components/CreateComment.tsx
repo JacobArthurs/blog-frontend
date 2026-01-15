@@ -48,7 +48,7 @@ export function CreateComment({
         content,
         author_name: name
       }
-      await apiClient.post<Comment>(`/comments`, createData)
+      await apiClient.post<Comment>(`/comments/`, createData)
       toast.success(`${isReply ? 'Reply' : 'Comment'} submitted successfully`)
       setContent('')
       setIsDialogOpen(false)
