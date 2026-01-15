@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Controller, useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import { Trash2 } from 'lucide-react'
 import {
   Card,
   CardContent,
@@ -90,6 +91,27 @@ function TagPage() {
     }
   }
 
+  const handleDeleteTag = async () => {
+    if (
+      !window.confirm(
+        'Are you sure you want to delete this tag? This action cannot be undone.'
+      )
+    )
+      return
+
+    try {
+      setIsLoading(true)
+      await apiClient.delete(`/tags/${id}`)
+      toast.success('Tag deleted successfully')
+      navigate('/admin')
+    } catch (error) {
+      console.error('Failed to delete tag:', error)
+      toast.error('Failed to delete tag')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return (
     <div className="flex min-h-[60vh] w-full items-center justify-center">
       <Card className="w-full sm:max-w-md">
@@ -145,20 +167,38 @@ function TagPage() {
             </FieldGroup>
           </form>
         </CardContent>
-        <CardFooter>
+        <CardFooter className="justify-between">
           <Field orientation="horizontal">
             <Button
               type="button"
+              className="cursor-pointer"
               variant="outline"
               onClick={() => navigate('/admin')}
               disabled={isLoading}
             >
               Cancel
             </Button>
-            <Button type="submit" form="form-tag" disabled={isLoading}>
+            <Button
+              type="submit"
+              className="cursor-pointer"
+              form="form-tag"
+              disabled={isLoading}
+            >
               {isLoading ? 'Saving...' : isEditing ? 'Update' : 'Create'}
             </Button>
           </Field>
+          {isEditing && (
+            <Button
+              type="button"
+              className="cursor-pointer"
+              variant="destructive"
+              onClick={handleDeleteTag}
+              disabled={isLoading}
+            >
+              <Trash2 />
+              Delete Tag
+            </Button>
+          )}
         </CardFooter>
       </Card>
     </div>

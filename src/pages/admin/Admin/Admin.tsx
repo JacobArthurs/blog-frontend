@@ -127,7 +127,10 @@ function Admin() {
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-4">
         <h2 className="text-2xl font-bold">Tags</h2>
-        <Button onClick={() => navigate('/admin/tag')} className="w-fit">
+        <Button
+          onClick={() => navigate('/admin/tag')}
+          className="w-fit cursor-pointer"
+        >
           New Tag
         </Button>
       </div>
@@ -170,7 +173,10 @@ function Admin() {
 
       <div className="flex flex-col gap-4">
         <h2 className="text-2xl font-bold">Posts</h2>
-        <Button onClick={() => navigate('/admin/post')} className="w-fit">
+        <Button
+          onClick={() => navigate('/admin/post')}
+          className="w-fit cursor-pointer"
+        >
           New Post
         </Button>
       </div>

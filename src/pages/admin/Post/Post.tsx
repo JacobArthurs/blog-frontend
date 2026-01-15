@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Controller, useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useCallback, useEffect, useState } from 'react'
-import { Check, ChevronsUpDown, X } from 'lucide-react'
+import { Check, ChevronsUpDown, Trash2, X } from 'lucide-react'
 import {
   Card,
   CardContent,
@@ -178,6 +178,27 @@ function PostPage() {
     } catch (error) {
       console.error('Failed to delete comment:', error)
       alert('Failed to delete comment')
+    }
+  }
+
+  const handleDeletePost = async () => {
+    if (
+      !window.confirm(
+        'Are you sure you want to delete this post? This action cannot be undone.'
+      )
+    )
+      return
+
+    try {
+      setIsLoading(true)
+      await apiClient.delete(`/posts/${id}`)
+      toast.success('Post deleted successfully')
+      navigate('/admin')
+    } catch (error) {
+      console.error('Failed to delete post:', error)
+      toast.error('Failed to delete post')
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -404,7 +425,7 @@ function PostPage() {
             </FieldGroup>
           </form>
         </CardContent>
-        <CardFooter>
+        <CardFooter className="justify-between">
           <Field orientation="horizontal">
             <Button
               type="button"
@@ -424,6 +445,18 @@ function PostPage() {
               {isLoading ? 'Saving...' : isEditing ? 'Update' : 'Create'}
             </Button>
           </Field>
+          {isEditing && (
+            <Button
+              type="button"
+              className="cursor-pointer"
+              variant="destructive"
+              onClick={handleDeletePost}
+              disabled={isLoading}
+            >
+              <Trash2 />
+              Delete Post
+            </Button>
+          )}
         </CardFooter>
       </Card>
 
