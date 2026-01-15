@@ -174,7 +174,7 @@ function Admin() {
           New Post
         </Button>
       </div>
-      {posts.length > 0 && (
+      {(posts.length > 0 || featuredPost) && (
         <div className="flex flex-col gap-4">
           <Table>
             <TableHeader>
