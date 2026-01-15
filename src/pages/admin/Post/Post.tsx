@@ -133,7 +133,7 @@ function PostPage() {
           featured: data.featured,
           tag_ids: data.tag_ids
         }
-        await apiClient.post('/posts', createData)
+        await apiClient.post('/posts/', createData)
       }
       toast.success('Post saved successfully')
       navigate('/admin')
