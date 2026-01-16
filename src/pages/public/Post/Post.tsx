@@ -78,6 +78,16 @@ function Post() {
     fetchPost()
   }, [slug, navigate])
 
+  useEffect(() => {
+    if (post?.title) {
+      document.title = post.title
+    }
+
+    return () => {
+      document.title = 'Jacob Arthurs Blog'
+    }
+  }, [post?.title])
+
   const fetchComments = useCallback(async () => {
     if (!post?.id) return
 
