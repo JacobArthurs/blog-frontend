@@ -69,7 +69,7 @@ function Footer() {
                 <TooltipTrigger asChild>
                   <Button variant="ghost" asChild>
                     <a
-                      href={`${import.meta.env.VITE_API_BASE_URL}/rss.xml`}
+                      href="/rss.xml"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
