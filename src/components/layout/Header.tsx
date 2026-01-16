@@ -78,7 +78,7 @@ function Header() {
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Personal Website</p>
+                  <p>Portfolio Website</p>
                 </TooltipContent>
               </Tooltip>
               <Tooltip>
