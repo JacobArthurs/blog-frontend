@@ -111,7 +111,11 @@ export function RichTextEditor({
       ...(enableLinks
         ? [
             Link.configure({
-              openOnClick: false
+              openOnClick: false,
+              HTMLAttributes: {
+                target: '_blank',
+                rel: 'noopener noreferrer'
+              }
             })
           ]
         : []),

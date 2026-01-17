@@ -112,7 +112,9 @@ export function Comment({ comment, onRefresh }: CommentProps) {
           <div
             className="ProseMirror-comment mb-2"
             dangerouslySetInnerHTML={{
-              __html: DOMPurify.sanitize(highlightCodeBlocks(comment.content))
+              __html: DOMPurify.sanitize(highlightCodeBlocks(comment.content), {
+                ADD_ATTR: ['target']
+              })
             }}
           />
 

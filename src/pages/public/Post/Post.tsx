@@ -292,7 +292,9 @@ function Post() {
         <div
           className="ProseMirror"
           dangerouslySetInnerHTML={{
-            __html: DOMPurify.sanitize(highlightCodeBlocks(post.content))
+            __html: DOMPurify.sanitize(highlightCodeBlocks(post.content), {
+              ADD_ATTR: ['target']
+            })
           }}
         />
         <Separator className="my-8" />
